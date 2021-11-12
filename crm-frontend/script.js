@@ -28,7 +28,7 @@
     return wrapper;
   }
   function assigment() {
-    createClientList(getClients(searchInput.value));
+    createClientList(getClientSearch(searchInput.value));
   }
   const imputTimeout = debounce(assigment, 300);
   searchInput.addEventListener('input', imputTimeout);
@@ -540,6 +540,7 @@
   }
   async function getClientSearch(value) {
     const response = await fetch(`http://localhost:3000/api/clients/search=${value}`);
+    console.log(response.json());
     return await response.json();
   }
 })();
