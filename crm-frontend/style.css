@@ -75,8 +75,31 @@ body {
 .table {
   display: grid;
   width: 100%;
-  margin-bottom: 40px;
+}
 
+.table__white-screen {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 300px;
+  background-color: var(--white);
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.table__loading {
+  margin: 0 auto;
+  width: 80px;
+  height: 80px;
+  animation: rotate 3s infinite linear;
 }
 
 .table__row {
@@ -103,26 +126,21 @@ body {
   font-size: 12px;
   font-weight: 400;
   color: var(--grey);
+  cursor: pointer;
 }
 
-.table__header-id {
-  padding-right: 13px;
-  background: url(./img/arrow.svg) right center no-repeat;
+.table__header-arrow {
+  position: relative;
+  top: 3px;
+  width: 14px;
+  height: 14px;
+  transform: rotate(0);
+  transition: all 1s;
 }
 
-.table__header-fio-sort {
-  padding-left: 13px;
-  background: url(./img/arrow.svg) left center no-repeat;
-}
-
-.table__header-date {
-  padding-right: 13px;
-  background: url(./img/arrow.svg) right center no-repeat;
-}
-
-.table__header-change {
-  padding-right: 13px;
-  background: url(./img/arrow.svg) right center no-repeat;
+.table__header-rotate {
+  transform: rotate(180deg);
+  transition: all 1s;
 }
 
 .table__item-id {
@@ -147,12 +165,13 @@ body {
 
 .table__item-contacts {
   position: relative;
+  display: flex;
+  flex-flow: row wrap;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   align-self: start;
-  /* background-color: var(--black); */
 }
 
 .contacts-wrapper {
@@ -164,6 +183,7 @@ body {
 }
 
 .contacts {
+  position: relative;
   display: block;
   width: 16px;
   height: 16px;
@@ -171,10 +191,43 @@ body {
   margin-bottom: 7px;
 }
 
+
+.contacts:hover::before {
+  content: '';
+  position: absolute;
+  top: -95%;
+  left: 12%;
+  transform: rotate(45deg);
+  width: 10px;
+  height: 10px;
+  background-color: var(--black);
+}
+
+.contacts:hover::after {
+  content: attr(data-href);
+  position: absolute;
+  display: flex;
+  top: -260%;
+  padding: 8px 16px;
+  width: auto;
+  left: -100%;
+  height: auto;
+  text-align: center;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: bold;
+  color: var(--white);
+  background-color: var(--black);
+}
+
 .contacts__btn-hide {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 7px;
+  margin-bottom: 7px;
   border: 1px solid var(--firm);
   border-radius: 50px;
   font-size: 8px;
@@ -206,6 +259,15 @@ body {
   border: none;
   font-size: 14px;
   color: var(--black);
+  transition: color 0.2s ease;
+}
+
+.table__item-delete-item:hover {
+  color: var(--red);
+}
+
+.table__item-change-modal:hover {
+  color: var(--firm);
 }
 
 .item-event-btn:first-child {
@@ -235,7 +297,7 @@ body {
   margin-bottom: 7px;
 }
 
-.modal__form {
+.modal {
   visibility: hidden;
   position: absolute;
   top: 0;
@@ -244,10 +306,11 @@ body {
   height: 100vh;
   background-color: #0000009e;
   opacity: 0;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.1s ease, visibility 0.1s ease;
+  z-index: 9;
 }
 
-.form__modal {
+.modal__form {
   display: flex;
   flex-flow: column nowrap;
   position: absolute;
@@ -258,7 +321,8 @@ body {
   overflow: hidden;
   background: var(--white);
   transform: scale(0.7);
-  transition: transform 0.3s ease;
+  transition: transform 0.1s ease;
+  z-index: 99;
 }
 
 .form__close_btn {
@@ -279,7 +343,6 @@ body {
   border: none;
   background: none;
   border-bottom: 1px solid var(--grey);
-  opacity: 0.5;
 }
 
 .form__inputs_wrapper {
@@ -293,6 +356,7 @@ body {
   color: var(--grey);
   transform: scale(143%) translateY(11px) translateX(58px);
   transition: transform 0.4s ease-out;
+  pointer-events: none;
 }
 
 .form__add_contacts-wrapper {
@@ -318,6 +382,10 @@ body {
   min-height: 35px;
   border: none;
   background: url(./img/plusCircle.svg) 2px center no-repeat;
+  transition: background 0.2s ease ;
+}
+.form__add_contact:hover {
+  background: url(./img/plusFill.svg) 2px center no-repeat;
 }
 
 .form__submit {
@@ -347,7 +415,6 @@ body {
   height: 37px;
   width: 100%;
   margin-bottom: 15px;
-  border: 1px solid var(--grey);
 }
 
 .select__wrapper {
@@ -355,7 +422,7 @@ body {
   display: flex;
   align-items: center;
   min-width: 123px;
-  border-right: 1px solid var(--grey);
+  border: 1px solid var(--grey);
   background-color: var(--background);
   cursor: pointer;
 }
@@ -422,27 +489,48 @@ body {
 .contact__input {
   width: 100%;
   padding-left: 12px;
-  border: none;
-  border-right: 1px solid var(--grey);
+  border-top: 1px solid var(--grey);
+  border-bottom: 1px solid var(--grey);
+  border-right: none;
+  border-left: none;
   background: none;
 }
 
 .contact__button {
   position: relative;
+  border: 1px solid var(--grey);
   padding: 0 10px;
-  border: none;
   background: url(./img/cancelGrey.svg) center center no-repeat;
+  background-color: #bcbcbc4a;
+  transition: bacground 0.3s ease, border 0.3s ease;
 }
 
-.contact__button::before {
+.contact__button:hover {
+  border: 1px solid var(--red);
+  background: url(./img/cancelRed.svg) center center no-repeat;
+  background-color: #bcbcbc4a;
+}
+
+.contact__button:hover::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #bcbcbc4a;
-  pointer-events: none;
+  top: -4px;
+  left: 5px;
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  background-color: var(--black);
+}
+
+.contact__button:hover::after {
+  content: 'Удалить контакт';
+  position: absolute;
+  top: -145%;
+  left: -150%;
+  padding: 8px 12px;
+  color: var(--white);
+  background-color: var(--black);
+  z-index: 102;
 }
 
 .form__question {

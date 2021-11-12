@@ -12,35 +12,44 @@
 </head>
 
 <body>
+  <svg style="display: none;">
+    <symbol width="12" height="12" viewBox="0 0 12 12" id="arrow" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 6L2.705 6.705L5.5 3.915L5.5 10L6.5 10L6.5 3.915L9.29 6.71L10 6L6 2L2 6Z" fill="#9873FF"/>
+    </symbol>
+  </svg>
   <header class="header">
     <div class="header__wrapper">
-      <img class="header__logo" src="./img/Logo.svg" alt="Skillbus">
-      <input class="header__search js-header-searh" placeholder="Введите запрос" type="text">
+      <img class="header__logo" src="./img/Logo.svg" alt="Skillbus Logo">
+      <input class="header__search js-header-search" placeholder="Введите запрос" type="text">
     </div>
   </header>
   <section class="main">
     <div class="container">
       <h1 class="main__title">Клиенты</h1>
-      <div class="table-wrapper">
+      <div class="table-wrapper js-table-wrapper">
         <table class="table">
           <tbody class="js-table">
             <tr class="table__row">
-              <th class="table__header table__header-id">ID</th>
-              <th class="table__header table__header-fio">Фамилия Имя Отчество <span class="table__header-fio-sort">
-                  А-Я</span></th>
-              <th class="table__header table__header-date">Дата и время создания</th>
-              <th class="table__header table__header-change">Последние изменения</th>
+              <th class="table__header js-sort-id"><span>ID</span><svg class="table__header-arrow" width:="4" heigth:="4" viewbox="0 0 14 14" id="idArrow"><use xlink:href="#arrow"></use></svg></th>
+              <th class="table__header js-sort-fio"><span>Фамилия Имя Отчество</span><svg class="table__header-arrow" width:="4" heigth:="4" viewbox="0 0 14 14" id="fioArrow"><use xlink:href="#arrow"></use></svg><span class="table__header-fio-sort">А-Я</span></th>
+              <th class="table__header js-sort-add"><span>Дата и время создания</span><svg class="table__header-arrow" width:="4" heigth:="4" viewbox="0 0 14 14" id="addArrow"><use xlink:href="#arrow"></use></svg></th>
+              <th class="table__header js-sort-change"><span>Последние изменения</span><svg class="table__header-arrow" width:="4" heigth:="4" viewbox="0 0 14 14" id="changeArrow"><use xlink:href="#arrow"></use></svg></th>
               <th class="table__header">Контакты</th>
               <th class="table__header">Действия</th>
             </tr>
           </tbody>
         </table>
+        <div class="table__white-screen">
+          <div class="table__loading"><svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.00025 40.0005C4.00025 59.8825 20.1182 76.0005 40.0002 76.0005C59.8822 76.0005 76.0002 59.8825 76.0002 40.0005C76.0002 20.1185 59.8823 4.00049 40.0003 4.00049C35.3513 4.00048 30.9082 4.88148 26.8282 6.48648" stroke="#9873FF" stroke-width="8" stroke-miterlimit="10" stroke-linecap="round"/>
+          </svg></div>
+        </div>
         <button class="btn-add-client js-add-client">Добавить клиента</button>
       </div>
     </div>
   </section>
-  <div class="modal__form js-modal-add-client">
-    <form class="form form__modal js-form-add">
+  <div class="modal js-modal-add-client">
+    <form class="form modal__form js-form-add">
       <div class="form__subtitle_wrapper">
         <h3 class="form__subtitle">Новый клиент</h3>
         <button class="form__close_btn js-close-modal"></button>
@@ -60,8 +69,8 @@
       <button class="form__cancel js-close-modal">Отмена</button>
     </form>
   </div>
-  <div class="modal__form js-modal-change-data">
-    <form class="form form__modal js-form-change">
+  <div class="modal js-modal-change-data">
+    <form class="form modal__form js-form-change">
       <div class="form__subtitle_wrapper js-subtitle_wrapper">
         <h3 class="form__subtitle js-subtitle">Изменить данные</h3>
         <div class="table__item-id js-client-id"></div>
@@ -74,14 +83,14 @@
       <span class="form__input_placeholder">Отчество</span>
       <input class="form__input" name="surname" type="text" data-form="input">
       <div class="form__add_contacts-wrapper">
-        <button class="form__add_contact js-btn-change-contact">Добавить контакт</button>
+        <button class="form__add_contact js-btn-add-contact">Добавить контакт</button>
       </div>
       <button class="form__submit" type="submit">Сохранить</button>
       <button class="form__cancel js-delete-client">Удалить клиента</button>
     </form>
   </div>
-  <div class="modal__form js-modal-delete-client">
-    <form class="form form__modal form__delete_modal js-form-delete">
+  <div class="modal js-modal-delete-client">
+    <form class="form modal__form form__delete_modal js-form-delete">
       <h3 class="form__subtitle js-subtitle">Удалить клиента</h3>
       <button class="form__close_btn form__close__delete js-close-modal"></button>
       <div class="form__question">Вы действительно хотите удалить данного клиента?</div>
