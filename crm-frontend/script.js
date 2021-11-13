@@ -27,8 +27,12 @@
     }
     return wrapper;
   }
-  function assigment() {
-    createClientList(getClientSearch(searchInput.value));
+  async function assigment() {
+    const items = table.querySelectorAll('.js-item-row');
+    items.forEach(elem => {
+      elem.remove();
+    })
+    return createClientList(await getClientSearch(searchInput.value));
   }
   const imputTimeout = debounce(assigment, 300);
   searchInput.addEventListener('input', imputTimeout);
@@ -237,15 +241,17 @@
     screen.style = '';
     modal.style = '';
   }
-
-  modalAddClient.children[0].addEventListener('click', event => {
-    event._isClickWhithinModal = true;
+  
+  modalScreens.forEach(item => {
+    item.children[0].addEventListener('click', event => {
+      event._isClickWhithinModal = true;
+    })
   })
 
   modalScreens.forEach(item => {
     item.addEventListener('click', event => {
       if (event._isClickWhithinModal) {
-        return
+        return;
       }
       const form = item.children[0];
       const wrap = form.querySelector('.form__add_contacts-wrapper');
@@ -475,7 +481,6 @@
     if (contacts !== []) {
       client.contacts = contacts;
     }
-    console.log(client);
     if (id === 'null' || id === undefined) {
       postClient(client);
     } else {
@@ -539,8 +544,7 @@
     })
   }
   async function getClientSearch(value) {
-    const response = await fetch(`http://localhost:3000/api/clients/search=${value}`);
-    console.log(response.json());
+    const response = await fetch(`http://localhost:3000/api/clients/?search=${value}`);
     return await response.json();
   }
 })();
