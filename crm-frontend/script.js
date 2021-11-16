@@ -8,7 +8,6 @@
   const table = document.querySelector('.js-table');
   const modalChangeData = document.querySelector('.js-modal-change-data');
   const inputs = document.querySelectorAll('input');
-  const modalCloseBtn = document.querySelectorAll('.js-close-modal');
   const modalDeleteWrapper = document.querySelector('.js-modal-delete-client');
   const modalFormDelete = document.querySelector('.js-form-delete');
   const modalScreens = document.querySelectorAll('.modal');
@@ -18,6 +17,7 @@
 
   function debounce(fn, debounceTime) {
     let timerId;
+
     function wrapper() {
       function foo() {
         return fn();
@@ -69,7 +69,7 @@
       const client = `
       <tr class="table__item js-item-row">
       <td class="table__item-id">${item.id}</td>
-      <td class="table__item-fio">${item.lastName + ' ' + item.name + ' ' + item.surname}</td>
+      <td class="table__item-fio">${item.surname + ' ' + item.name + ' ' + item.lastName}</td>
       <td class="table__item-date">${dateCreate.date} <span class="table__item-time">${dateCreate.time}</span></td>
       <td class="table__item-date">${dateChange.date} <span class="table__item-time">${dateChange.time}</span></td>
       <td class="table__item-contacts">${links.outerHTML}</td>
@@ -96,7 +96,7 @@
           } else {
             id = btn.parentElement.parentElement.children[0].textContent;
           }
-          deleteClientModal(btn, id)
+          openModalDelete(btn, id)
         })
       })
       const modalChangeBtn = document.querySelectorAll('.js-change-client');
@@ -147,8 +147,6 @@
     const temp = JSON.parse(JSON.stringify(arr));
     temp.forEach(item => {
       item.family = item.lastName.charCodeAt(0);
-      item.createSort = item.createdAt.split('-');
-      item.changeSort = item.createdAt.split('-');
     })
     if (btn === 'id') {
       temp.sort((a, b) => +a.id > +b.id ? 1 : -1);
@@ -227,6 +225,7 @@
   inputs.forEach((item) => {
     if (item.dataset.form === 'input') {
       item.addEventListener('focus', () => {
+        item.style = '';
         item.previousElementSibling.style.cssText = 'transform: scale(100%) translateY(0) translateX(0)'
       });
       item.addEventListener('blur', () => {
@@ -240,15 +239,13 @@
   function hideModal(screen, modal) {
     screen.style = '';
     modal.style = '';
+    location.hash = '';
   }
-  
+
   modalScreens.forEach(item => {
     item.children[0].addEventListener('click', event => {
       event._isClickWhithinModal = true;
     })
-  })
-
-  modalScreens.forEach(item => {
     item.addEventListener('click', event => {
       if (event._isClickWhithinModal) {
         return;
@@ -265,39 +262,60 @@
       hideModal(item.children[0], item);
     })
   })
+
+  modalFormAdd.addEventListener('submit', (e) => {
+    e.preventDefault();
+    completeModalForm(modalFormAdd, 'null');
+  })
+
   addClientBtn.addEventListener('click', () => {
     modalAddClient.style.cssText = `visibility: visible; opacity: 1;`;
     modalFormAdd.style.transform = 'scale(1)';
-    modalFormAdd.addEventListener('submit', (e) => {
-      e.preventDefault();
-      completeModalForm(modalFormAdd, 'null');
+    closeBtn = modalFormAdd.querySelectorAll('.js-close-modal');
+    closeBtn.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal(modalFormAdd, modalAddClient);
+      })
     })
-    closeModal(modalFormAdd, modalAddClient);
   });
 
   function closeModal(form, screen) {
-    modalCloseBtn.forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        const inputs = form.querySelectorAll('input');
-        inputs.forEach(item => {
-          item.value = '';
-        })
-        const wrapper = form.querySelector('.form__add_contacts-wrapper');
-        const contacts = form.querySelectorAll('.contact');
-        if (contacts.length > 0) {
-          cheсkNChange(wrapper, 'close');
-          contacts.forEach(elem => {
-            elem.remove();
-          })
-        };
-        hideModal(screen, form);
-      });
-    });
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach(item => {
+      item.value = '';
+    })
+    const wrapper = form.querySelector('.form__add_contacts-wrapper');
+    const contacts = form.querySelectorAll('.contact');
+    if (contacts.length > 0) {
+      cheсkNChange(wrapper, 'close');
+      contacts.forEach(elem => {
+        elem.remove();
+      })
+    };
+    hideModal(screen, form);
+  }
+
+  if (location.hash !== '') {
+    const id = window.location.hash.substring(1);
+    openModalChange(modalFormChange, id);
   }
 
   async function openModalChange(form, id) {
+    if (location.hash !== id) {
+      window.location.hash = id;
+    }
+    const submitBtn = form.querySelector('.js-submit-btn');
+    submitBtn.style.backgroundColor = 'var(--activeFirm)';
+    const loadingCircleBtn = form.querySelector('.btn-loading-svg');
+    loadingCircleBtn.style.display = 'inline';
+    modalChangeData.style.cssText = `visibility: visible; opacity: 1;`;
+    modalFormChange.style.transform = 'scale(1)';
     const response = await getClient(id);
+    if (!!response) {
+      loadingCircleBtn.style.display = 'none';
+      submitBtn.style.backgroundColor = 'var(--firm)';
+    }
     const clientId = form.querySelector('.js-client-id');
     const addContactBtn = form.querySelector('.js-btn-add-contact');
     for (let i = 0; i < response.contacts.length; i++) {
@@ -313,14 +331,37 @@
     form.name.previousElementSibling.style.cssText = 'transform: scale(100%) translateY(0) translateX(0)';
     form.surname.value = response.surname;
     form.surname.previousElementSibling.style.cssText = 'transform: scale(100%) translateY(0) translateX(0)';
-    modalChangeData.style.cssText = `visibility: visible; opacity: 1;`;
-    modalFormChange.style.transform = 'scale(1)';
-    modalFormChange.addEventListener('submit', (e) => {
+    modalFormChange.addEventListener('submit', e => {
       e.preventDefault();
       completeModalForm(modalFormChange, id);
       closeModal(modalFormChange, modalChangeData);
     });
-    closeModal(modalFormChange, modalChangeData);
+    const closeBtn = form.querySelector('.js-close-modal');
+    closeBtn.addEventListener('click', e => {
+      e.preventDefault();
+      closeModal(modalFormChange, modalChangeData);
+    })
+  }
+
+  function openModalDelete(btn, id) {
+    btn.parentElement.classList.contains('form') ? hideModal(modalFormChange, modalChangeData) : '';
+    modalDeleteWrapper.style.cssText = `visibility: visible; opacity: 1;`;
+    modalFormDelete.style.transform = 'scale(1)';
+    const submitLoadingCircle = modalFormDelete.querySelector('.btn-loading-svg');
+    const submitBtn = modalFormDelete.querySelector('.js-submit-btn');
+    modalFormDelete.addEventListener('submit', e => {
+      e.preventDefault();
+      submitLoadingCircle.style.display = 'inline-block';
+      submitBtn.style.backgroundColor = 'var(--activeFirm)';
+      deleteClient(id);
+    });
+    const closeBtn = modalFormDelete.querySelectorAll('.js-close-modal');
+    closeBtn.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal(modalFormDelete, modalDeleteWrapper);
+      });
+    });
   }
 
   addContactBtn.forEach(item => {
@@ -373,12 +414,22 @@
     inputContact.placeholder = 'Введите данные контакта';
     formContactWrapper.append(selectWrapper, inputContact);
     selectWrapper.append(select, selectBody)
+
     selectBody.append(optionPhone, optionOtherPhone, optionEmail, optionVk, optionFacebook, optionOther);
+
     const deleteContactBtn = document.createElement('button');
     deleteContactBtn.className = 'contact__button js-remove-contact';
     formContactWrapper.append(deleteContactBtn);
 
     deleteContactBtn.addEventListener('click', deleteContact);
+
+    // inputContact.addEventListener('keyup', () => {
+    //   if(inputContact.value.length !== 0) {
+    //     deleteContactBtn.style.display = 'block';
+    //   } else {
+    //     deleteContactBtn.style.display = 'none';
+    //   }
+    // })
 
     let options = selectBody.childNodes;
     options.forEach(item => {
@@ -429,43 +480,32 @@
     }
   }
 
-  function deleteClientModal(btn, id) {
-    btn.parentElement.classList.contains('form') ? hideModal(modalFormChange, modalChangeData) : '';
-    modalDeleteWrapper.style.cssText = `visibility: visible; opacity: 1;`;
-    modalFormDelete.style.transform = 'scale(1)';
-    modalFormDelete.addEventListener('submit', (e) => {
-      e.preventDefault();
-      deleteClient(id);
-    })
-    modalCloseBtn.forEach(item => {
-      item.addEventListener('click', () => {
-        closeModal(modalFormDelete, modalDeleteWrapper);
-      });
-    });
-  }
-
   function completeModalForm(form, id) {
     client = {};
     contacts = [];
+    const submitLoadingCircle = form.querySelector('.btn-loading-svg');
+    const submitBtn = form.querySelector('.js-submit-btn');
     const contactData = form.querySelectorAll('.contact__data');
-    contactData.forEach(item => {
-      const contact = {};
-      if (item.children[1].value !== '') {
-        contact.type = item.children[0].children[0].textContent;
-        contact.value = item.children[1].value;
-      } else {
-        return;
-      }
-      contacts.push(contact);
-      return contacts;
-    })
-    if (form.elements.lastname.name === 'lastname') {
-      if (form.lastname.value !== '') {
-        client.lastName = form.lastname.value;
+    if (contactData.length > 0) {
+      contactData.forEach(item => {
+        const contact = {};
+        if (item.children[1].value !== '') {
+          contact.type = item.children[0].children[0].textContent;
+          contact.value = item.children[1].value;
+        } else {
+          return;
+        }
+        contacts.push(contact);
+        return contacts;
+      });
+    };
+    if (form.elements.surname.name === 'surname') {
+      if (form.surname.value !== '') {
+        client.surname = form.surname.value;
       } else {
         return;
       };
-    }
+    };
     if (form.elements.name.name === 'name') {
       if (form.name.value !== '') {
         client.name = form.name.value;
@@ -473,17 +513,21 @@
         return;
       };
     }
-    if (form.elements.surname.name === 'surname') {
-      if (form.surname.value !== '') {
-        client.surname = form.surname.value;
+    if (form.elements.lastname.name === 'lastname') {
+      if (form.lastname.value !== '') {
+        client.lastName = form.lastname.value;
       };
-    }
-    if (contacts !== []) {
+    };
+    if (contacts.length !== 0) {
       client.contacts = contacts;
-    }
+    };
     if (id === 'null' || id === undefined) {
-      postClient(client);
+      submitLoadingCircle.style.display = 'inline-block';
+      submitBtn.style.backgroundColor = 'var(--activeFirm)';
+      postClient(client, form);
     } else {
+      submitLoadingCircle.style.display = 'inline-block';
+      submitBtn.style.backgroundColor = 'var(--activeFirm)';
       patchClient(id, client);
     };
   }
@@ -512,7 +556,7 @@
     name,
     surname,
     contacts
-  }) {
+  }, form) {
     const response = await fetch('http://localhost:3000/api/clients', {
       method: 'POST',
       body: JSON.stringify({
@@ -525,7 +569,28 @@
         'Content-Type': 'application/json',
       }
     })
-    return await response.json();
+    if (response.status === 422) {
+      const errors = await response.json();
+      const errorText = document.createElement('p');
+      errorText.className = 'form__error';
+      errorText.textContent = `Ошибка: ${errors.errors[0].message}`;
+      const submitBtn = form.querySelector('.form__submit');
+      const errorElem = form.querySelectorAll('.form__error');
+      if (errorElem.length === 0) {
+        submitBtn.before(errorText);
+      } else {
+        return;
+      }
+      errorText.previousElementSibling.style.marginBottom = '0';
+      if (errors.errors[0].field === 'surname') {
+        form.surname.style.borderBottom = '1px solid red';
+      }
+      if (errors.errors[0].field === 'name') {
+        form.name.style.borderBottom = '1px solid red';
+      }
+    } else {
+      return await response.json();
+    }
   }
   async function getClients() {
     const response = await fetch(`http://localhost:3000/api/clients`);
@@ -536,9 +601,6 @@
     return await response.json();
   }
   async function deleteClient(id) {
-    // if (!confirm('Вы уверены?')) {
-    //   return;
-    // }
     fetch(`http://localhost:3000/api/clients/${id}`, {
       method: 'DELETE',
     })

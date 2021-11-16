@@ -4,6 +4,7 @@
   --black: #333;
   --grey: #C8C5D1;
   --firm: #9873FF;
+  --activeFirm: #8052FF;
   --red: #F06A4D;
   --orange: #E6B127;
   --bg: #f5f5f5;
@@ -30,10 +31,12 @@ h5 {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  position: relative;
 }
 
 .container {
-  max-width: 1186px;
+  padding: 20px;
+  max-width: 1146px;
   margin: 0 auto;
 }
 
@@ -41,10 +44,11 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 100vw;
   padding: 20px;
   box-shadow: 0 -5px 20px #333;
   background-color: white;
+  z-index: 99;
 }
 
 .header__wrapper {
@@ -64,6 +68,7 @@ body {
 
 .main {
   padding-top: 130px;
+  width: 100vw;
   height: 100vh;
   background-color: var(--bg);
 }
@@ -104,7 +109,7 @@ body {
 
 .table__row {
   display: grid;
-  grid-template-columns: 10% 20% 20% 15% 10% 10%;
+  grid-template-columns: 13% 25% 17% 17% 13% 18%;
   justify-content: space-between;
   justify-items: start;
   padding: 0 20px;
@@ -112,7 +117,7 @@ body {
 
 .table__item {
   display: grid;
-  grid-template-columns: 13% 23% 23% 16% 11% 18%;
+  grid-template-columns: 13% 25% 17% 15% 12% 18%;
   justify-content: space-between;
   align-items: center;
   justify-items: start;
@@ -127,6 +132,11 @@ body {
   font-weight: 400;
   color: var(--grey);
   cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.table__header:active {
+  color: var(--black);
 }
 
 .table__header-arrow {
@@ -135,12 +145,11 @@ body {
   width: 14px;
   height: 14px;
   transform: rotate(0);
-  transition: all 1s;
+  transition: transform .5s ease;
 }
 
 .table__header-rotate {
   transform: rotate(180deg);
-  transition: all 1s;
 }
 
 .table__item-id {
@@ -285,6 +294,7 @@ body {
 .btn-add-client {
   display: block;
   margin: 0 auto;
+  margin-bottom: 50px;
   padding: 12.5px 26.5px 12.5px 58.5px;
   border: 1px solid var(--firm);
   background: url(./img/person.svg) 28px center no-repeat;
@@ -299,23 +309,23 @@ body {
 
 .modal {
   visibility: hidden;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   background-color: #0000009e;
   opacity: 0;
   transition: opacity 0.1s ease, visibility 0.1s ease;
-  z-index: 9;
+  z-index: 111;
 }
 
 .modal__form {
   display: flex;
   flex-flow: column nowrap;
-  position: absolute;
-  top: 10%;
-  left: 35%;
+  position: fixed;
+  top: 19vh;
+  left: 34vw;
   min-width: 450px;
   padding: 25px 30px;
   overflow: hidden;
@@ -389,6 +399,7 @@ body {
 }
 
 .form__submit {
+  position: relative;
   align-self: center;
   margin-bottom: 5px;
   padding: 12.5px 35px;
@@ -397,8 +408,17 @@ body {
   border: none;
   background-color: var(--firm);
   color: var(--white);
+  transition: background-color .2s ease;
 }
-
+.form__submit:active {
+  background-color: var(--activeFirm);
+}
+.btn-loading-svg {
+  display: none;
+  width: 13px;
+  height: 13px;
+  animation: rotate 3s infinite linear;
+}
 .form__cancel {
   align-self: center;
   background: none;
@@ -421,7 +441,7 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  min-width: 123px;
+  min-width: 35%;
   border: 1px solid var(--grey);
   background-color: var(--background);
   cursor: pointer;
@@ -459,12 +479,12 @@ body {
   position: absolute;
   top: 100%;
   left: -1px;
-  width: 124px;
+  width: 136px;
   background-color: var(--backgroundLigth);
   border: 1px solid var(--grey);
   transform: translateY(-100%);
   opacity: 0;
-  transition: opacity 0.2s ease-in, transform 0.1s ease-in-out;
+  transition: opacity 0.1s ease-in, transform 0.1s ease-in-out;
   pointer-events: none;
 }
 
@@ -491,7 +511,7 @@ body {
   padding-left: 12px;
   border-top: 1px solid var(--grey);
   border-bottom: 1px solid var(--grey);
-  border-right: none;
+  border-right: 1px solid var(--grey);
   border-left: none;
   background: none;
 }
@@ -499,6 +519,7 @@ body {
 .contact__button {
   position: relative;
   border: 1px solid var(--grey);
+  border-left: none;
   padding: 0 10px;
   background: url(./img/cancelGrey.svg) center center no-repeat;
   background-color: #bcbcbc4a;
@@ -550,4 +571,115 @@ body {
 .form__close__delete {
   position: absolute;
   right: 20px;
+}
+
+.form__error {
+  text-align: center;
+  color: var(--red);
+  font-size: 10px;
+  line-height: 14px;
+}
+
+@media (max-width: 1025px) {
+  .table__item {
+    grid-template-columns: 13% 25% 16% 13% 13% 19%;
+  }
+  .table__row {
+    grid-template-columns: 11% 22% 14% 14% 15% 14%;
+  }
+  .modal__form {
+    top: 24vh;
+    left: 27vw;
+  }
+}
+@media (max-width: 769px) {
+  .container {
+    width: 100vw;
+  }
+  .modal__form {
+    top: 26vh;
+    left: 21vw;
+  }
+  .table__item {
+    grid-template-columns: 15% 30% 12% 11% 17% 15%;
+  }
+  .table__row {
+    grid-template-columns: 15% 28% 12% 12% 18% 14%;
+  }
+  .table {
+    min-width: 728px;
+    width: inherit;
+  }
+  .table-wrapper {
+    position: relative;
+    min-width: 100vw;
+    overflow-x: scroll;
+  }
+  .table-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+}
+@media (max-width: 426px) {
+  .container {
+    padding: 10px;
+  }
+  .modal__form {
+    padding: 15px;
+    min-width: 300px;
+    max-width: 300px;
+    left: 10%;
+    top: 10vh;
+  }
+  .form__close_btn {
+    align-self: start;
+  }
+  .form__input_placeholder {
+    transform: scale(1.43) translateY(11px) translateX(38px);
+  }
+  .table__loading {
+    width: 36px;
+    height: 36px;
+  }
+  .table__loading-svg {
+    width: 36px;
+    height: 36px;
+  }
+  .select__body {
+    width: 94px;
+  }
+  .contact__input::placeholder {
+    font-size: 14px;
+  }
+  .header {
+    padding: 8px;
+  }
+  .header__search {
+    display: none;
+  }
+  .header__logo {
+    width: 24px;
+    height: 24px;
+    margin: 0 auto;
+  }
+  .main {
+    padding-top: 70px;
+  }
+  .main__title {
+    font-size: 18px;
+    padding-bottom: 20px;
+  }
+  .table__tbody {
+    overflow: hidden;
+    overflow-x: scroll;
+  }
+  .form__subtitle {
+    margin-right: 9px;
+  }
+}
+
+@media (max-width: 321px) {
+  .modal__form {
+    left: 4%;
+    top: 20vh;
+  }
 }

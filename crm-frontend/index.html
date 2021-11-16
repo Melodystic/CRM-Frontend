@@ -16,6 +16,9 @@
     <symbol width="12" height="12" viewBox="0 0 12 12" id="arrow" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M2 6L2.705 6.705L5.5 3.915L5.5 10L6.5 10L6.5 3.915L9.29 6.71L10 6L6 2L2 6Z" fill="#9873FF"/>
     </symbol>
+    <symbol width="13" height="13" viewBox="0 0 13 13" id="circle" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1.00008 6.03996C1.00008 8.82344 3.2566 11.08 6.04008 11.08C8.82356 11.08 11.0801 8.82344 11.0801 6.03996C11.0801 3.25648 8.82356 0.999956 6.04008 0.999956C5.38922 0.999956 4.7672 1.1233 4.196 1.348" stroke="#B89EFF" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"/>
+      </symbol>
   </svg>
   <header class="header">
     <div class="header__wrapper">
@@ -28,7 +31,7 @@
       <h1 class="main__title">Клиенты</h1>
       <div class="table-wrapper js-table-wrapper">
         <table class="table">
-          <tbody class="js-table">
+          <tbody class="table__tbody js-table">
             <tr class="table__row">
               <th class="table__header js-sort-id"><span>ID</span><svg class="table__header-arrow" width:="4" heigth:="4" viewbox="0 0 14 14" id="idArrow"><use xlink:href="#arrow"></use></svg></th>
               <th class="table__header js-sort-fio"><span>Фамилия Имя Отчество</span><svg class="table__header-arrow" width:="4" heigth:="4" viewbox="0 0 14 14" id="fioArrow"><use xlink:href="#arrow"></use></svg><span class="table__header-fio-sort">А-Я</span></th>
@@ -40,12 +43,12 @@
           </tbody>
         </table>
         <div class="table__white-screen">
-          <div class="table__loading"><svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div class="table__loading"><svg class="table__loading-svg" width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M4.00025 40.0005C4.00025 59.8825 20.1182 76.0005 40.0002 76.0005C59.8822 76.0005 76.0002 59.8825 76.0002 40.0005C76.0002 20.1185 59.8823 4.00049 40.0003 4.00049C35.3513 4.00048 30.9082 4.88148 26.8282 6.48648" stroke="#9873FF" stroke-width="8" stroke-miterlimit="10" stroke-linecap="round"/>
           </svg></div>
         </div>
-        <button class="btn-add-client js-add-client">Добавить клиента</button>
       </div>
+      <button class="btn-add-client js-add-client">Добавить клиента</button>
     </div>
   </section>
   <div class="modal js-modal-add-client">
@@ -56,16 +59,16 @@
       </div>
       <div class="form__inputs_wrapper">
         <span class="form__input_placeholder">Фамилия<span style="color: var(--firm);">*</span></span>
-        <input class="form__input" name="lastname" type="text" data-form="input">
+        <input class="form__input" name="surname" type="text" data-form="input">
         <span class="form__input_placeholder">Имя<span style="color: var(--firm);">*</span></span>
         <input class="form__input" name="name" type="text" data-form="input">
         <span class="form__input_placeholder">Отчество</span>
-        <input class="form__input" name="surname" type="text" data-form="input">
+        <input class="form__input" name="lastname" type="text" data-form="input">
       </div>
       <div class="form__add_contacts-wrapper">
         <button class="form__add_contact js-btn-add-contact">Добавить контакт</button>
       </div>
-      <button class="form__submit" type="submit">Сохранить</button>
+      <button class="form__submit js-submit-btn" type="submit"><svg class="btn-loading-svg"><use xlink:href="#circle"></use></svg> Сохранить</button>
       <button class="form__cancel js-close-modal">Отмена</button>
     </form>
   </div>
@@ -77,15 +80,15 @@
         <button class="form__close_btn js-close-modal"></button>
       </div>
       <span class="form__input_placeholder">Фамилия<span style="color: var(--firm);">*</span></span>
-      <input class="form__input" name="lastname" type="text" data-form="input">
+      <input class="form__input" name="surname" type="text" data-form="input">
       <span class="form__input_placeholder">Имя<span style="color: var(--firm);">*</span></span>
       <input class="form__input" name="name" type="text" data-form="input">
       <span class="form__input_placeholder">Отчество</span>
-      <input class="form__input" name="surname" type="text" data-form="input">
+      <input class="form__input" name="lastname" type="text" data-form="input">
       <div class="form__add_contacts-wrapper">
         <button class="form__add_contact js-btn-add-contact">Добавить контакт</button>
       </div>
-      <button class="form__submit" type="submit">Сохранить</button>
+      <button class="form__submit js-submit-btn" type="submit"><svg class="btn-loading-svg"><use xlink:href="#circle"></use></svg> Сохранить</button>
       <button class="form__cancel js-delete-client">Удалить клиента</button>
     </form>
   </div>
@@ -94,7 +97,7 @@
       <h3 class="form__subtitle js-subtitle">Удалить клиента</h3>
       <button class="form__close_btn form__close__delete js-close-modal"></button>
       <div class="form__question">Вы действительно хотите удалить данного клиента?</div>
-      <button class="form__submit" type="submit">Удалить</button>
+      <button class="form__submit js-submit-btn" type="submit"><svg class="btn-loading-svg"><use xlink:href="#circle"></use></svg> Удалить</button>
       <button class="form__cancel js-close-modal">Отмена</button>
     </form>
   </div>
