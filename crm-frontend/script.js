@@ -263,17 +263,21 @@
     })
   })
 
-  modalFormAdd.addEventListener('submit', (e) => {
-    e.preventDefault();
-    completeModalForm(modalFormAdd, 'null');
-  })
-
+  // modalFormAdd.addEventListener('submit', e => {
+  //   e.preventDefault();
+  // })
+  
   addClientBtn.addEventListener('click', () => {
     modalAddClient.style.cssText = `visibility: visible; opacity: 1;`;
     modalFormAdd.style.transform = 'scale(1)';
+    submitBtn = modalFormAdd.querySelector('.js-submit-btn');
+    submitBtn.addEventListener('click', e => {
+      e.preventDefault();
+      completeModalForm(modalFormAdd, 'null', e);
+    });
     closeBtn = modalFormAdd.querySelectorAll('.js-close-modal');
     closeBtn.forEach(item => {
-      item.addEventListener('click', (e) => {
+      item.addEventListener('click', e => {
         e.preventDefault();
         closeModal(modalFormAdd, modalAddClient);
       })
@@ -334,7 +338,6 @@
     modalFormChange.addEventListener('submit', e => {
       e.preventDefault();
       completeModalForm(modalFormChange, id);
-      closeModal(modalFormChange, modalChangeData);
     });
     const closeBtn = form.querySelector('.js-close-modal');
     closeBtn.addEventListener('click', e => {
@@ -357,7 +360,7 @@
     });
     const closeBtn = modalFormDelete.querySelectorAll('.js-close-modal');
     closeBtn.forEach(item => {
-      item.addEventListener('click', (e) => {
+      item.addEventListener('click', e => {
         e.preventDefault();
         closeModal(modalFormDelete, modalDeleteWrapper);
       });
@@ -423,14 +426,6 @@
 
     deleteContactBtn.addEventListener('click', deleteContact);
 
-    // inputContact.addEventListener('keyup', () => {
-    //   if(inputContact.value.length !== 0) {
-    //     deleteContactBtn.style.display = 'block';
-    //   } else {
-    //     deleteContactBtn.style.display = 'none';
-    //   }
-    // })
-
     let options = selectBody.childNodes;
     options.forEach(item => {
       item.addEventListener('click', selectOption);
@@ -480,7 +475,7 @@
     }
   }
 
-  function completeModalForm(form, id) {
+  function completeModalForm(form, id, e) {
     client = {};
     contacts = [];
     const submitLoadingCircle = form.querySelector('.btn-loading-svg');
@@ -524,11 +519,15 @@
     if (id === 'null' || id === undefined) {
       submitLoadingCircle.style.display = 'inline-block';
       submitBtn.style.backgroundColor = 'var(--activeFirm)';
-      postClient(client, form);
+      e.preventDefault();
+      closeModal(modalFormAdd, modalAddClient);
+      postClient(client, form, e);
     } else {
       submitLoadingCircle.style.display = 'inline-block';
       submitBtn.style.backgroundColor = 'var(--activeFirm)';
-      patchClient(id, client);
+      e.preventDefault();
+      closeModal(modalFormChange, modalChangeData);
+      patchClient(id, client, e);
     };
   }
 
@@ -556,7 +555,9 @@
     name,
     surname,
     contacts
-  }, form) {
+  }, form, e) {
+    console.log(e);
+    e.preventDefault();
     const response = await fetch('http://localhost:3000/api/clients', {
       method: 'POST',
       body: JSON.stringify({
@@ -600,7 +601,7 @@
     const response = await fetch(`http://localhost:3000/api/clients/${id}`);
     return await response.json();
   }
-  async function deleteClient(id) {
+  function deleteClient(id) {
     fetch(`http://localhost:3000/api/clients/${id}`, {
       method: 'DELETE',
     })

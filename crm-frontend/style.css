@@ -415,8 +415,8 @@ body {
 }
 .btn-loading-svg {
   display: none;
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   animation: rotate 3s infinite linear;
 }
 .form__cancel {
