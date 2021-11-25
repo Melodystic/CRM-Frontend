@@ -528,6 +528,7 @@ body {
 
 .contact__button:hover {
   border: 1px solid var(--red);
+  border-left: none;
   background: url(./img/cancelRed.svg) center center no-repeat;
   background-color: #bcbcbc4a;
 }

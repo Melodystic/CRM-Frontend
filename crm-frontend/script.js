@@ -2,18 +2,21 @@
   const searchInput = document.querySelector('.js-header-search');
   const addContactBtn = document.querySelectorAll('.js-btn-add-contact');
   const addClientBtn = document.querySelector('.js-add-client');
-  const modalAddClient = document.querySelector('.js-modal-add-client');
   const modalFormAdd = document.querySelector('.js-form-add');
   const modalFormChange = document.querySelector('.js-form-change');
   const table = document.querySelector('.js-table');
-  const modalChangeData = document.querySelector('.js-modal-change-data');
   const inputs = document.querySelectorAll('input');
+  const modalAddWrapper = document.querySelector('.js-modal-add-client');
+  const modalChangeWrapper = document.querySelector('.js-modal-change-data');
   const modalDeleteWrapper = document.querySelector('.js-modal-delete-client');
   const modalFormDelete = document.querySelector('.js-form-delete');
   const modalScreens = document.querySelectorAll('.modal');
   table.parentElement.style.marginBottom = '0';
   addClientBtn.style.display = 'none';
   let click = 0;
+  const once = {
+    once: true
+  };
 
   function debounce(fn, debounceTime) {
     let timerId;
@@ -56,7 +59,7 @@
       let arrow = document.getElementById('idArrow');
       arrow.classList.toggle('table__header-rotate');
       const loading = document.querySelector('.table__white-screen');
-      loading.remove();
+      loading.style.display = 'none';
       table.parentElement.style.marginBottom = '40px';
       return;
     }
@@ -86,7 +89,7 @@
       })
       const deleteClientBtn = document.querySelectorAll('.js-delete-client');
       deleteClientBtn.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', e => {
           e.preventDefault();
           let id;
           if (btn.parentElement.classList.contains('form')) {
@@ -236,55 +239,10 @@
     };
   });
 
-  function hideModal(screen, modal) {
-    screen.style = '';
-    modal.style = '';
-    location.hash = '';
-  }
-
-  modalScreens.forEach(item => {
-    item.children[0].addEventListener('click', event => {
-      event._isClickWhithinModal = true;
-    })
-    item.addEventListener('click', event => {
-      if (event._isClickWhithinModal) {
-        return;
-      }
-      const form = item.children[0];
-      const wrap = form.querySelector('.form__add_contacts-wrapper');
-      const contacts = item.children[0].querySelectorAll('.contact');
-      if (contacts.length > 0) {
-        cheсkNChange(wrap, 'close');
-        contacts.forEach(elem => {
-          elem.remove();
-        })
-      }
-      hideModal(item.children[0], item);
-    })
-  })
-
-  // modalFormAdd.addEventListener('submit', e => {
-  //   e.preventDefault();
-  // })
-  
-  addClientBtn.addEventListener('click', () => {
-    modalAddClient.style.cssText = `visibility: visible; opacity: 1;`;
-    modalFormAdd.style.transform = 'scale(1)';
-    submitBtn = modalFormAdd.querySelector('.js-submit-btn');
-    submitBtn.addEventListener('click', e => {
-      e.preventDefault();
-      completeModalForm(modalFormAdd, 'null', e);
-    });
-    closeBtn = modalFormAdd.querySelectorAll('.js-close-modal');
-    closeBtn.forEach(item => {
-      item.addEventListener('click', e => {
-        e.preventDefault();
-        closeModal(modalFormAdd, modalAddClient);
-      })
-    })
-  });
-
   function closeModal(form, screen) {
+    const loading = form.querySelector('.btn-loading-svg');
+    loading.style.display = 'none';
+    loading.parentElement.style = '';
     const inputs = form.querySelectorAll('input');
     inputs.forEach(item => {
       item.value = '';
@@ -300,9 +258,49 @@
     hideModal(screen, form);
   }
 
+  function hideModal(screen, modal) {
+    screen.style = '';
+    modal.style = '';
+    location.hash = '';
+  }
+
   if (location.hash !== '') {
     const id = window.location.hash.substring(1);
     openModalChange(modalFormChange, id);
+  }
+
+  addClientBtn.addEventListener('click', openModalAdd);
+
+  function openModalAdd() {
+    modalAddWrapper.style.cssText = `visibility: visible; opacity: 1;`;
+    modalFormAdd.style.transform = 'scale(1)';
+    submitBtn = modalFormAdd.querySelector('.js-submit-btn');
+
+    modalFormAdd.addEventListener('submit', submitAdd, once);
+
+    function submitAdd(e) {
+      e.preventDefault();
+      completeModalForm(modalFormAdd, 'null', e);
+    }
+
+    closeBtn = modalFormAdd.querySelectorAll('.js-close-modal');
+    closeBtn.forEach(item => {
+      item.addEventListener('click', e => {
+        e.preventDefault();
+        closeModal(modalFormAdd, modalAddWrapper);
+        modalFormAdd.removeEventListener('submit', submitAdd, once);
+      })
+    })
+    modalAddWrapper.addEventListener('click', (e) => {
+      modalFormAdd.addEventListener('click', event => {
+        event._isClickWhithinModal = true;
+      })
+      if (e._isClickWhithinModal) {
+        return;
+      }
+      closeModal(modalFormAdd, modalAddWrapper);
+      modalFormAdd.removeEventListener('submit', submitAdd, once);
+    })
   }
 
   async function openModalChange(form, id) {
@@ -313,7 +311,7 @@
     submitBtn.style.backgroundColor = 'var(--activeFirm)';
     const loadingCircleBtn = form.querySelector('.btn-loading-svg');
     loadingCircleBtn.style.display = 'inline';
-    modalChangeData.style.cssText = `visibility: visible; opacity: 1;`;
+    modalChangeWrapper.style.cssText = `visibility: visible; opacity: 1;`;
     modalFormChange.style.transform = 'scale(1)';
     const response = await getClient(id);
     if (!!response) {
@@ -325,6 +323,8 @@
     for (let i = 0; i < response.contacts.length; i++) {
       if (response.contacts.length >= 10) {
         addContactBtn.style.display = 'none';
+      } else if (response.contacts.length < 9) {
+        addContactBtn.style.display = 'block';
       }
       createContact(addContactBtn, response.contacts[i]);
     }
@@ -335,43 +335,81 @@
     form.name.previousElementSibling.style.cssText = 'transform: scale(100%) translateY(0) translateX(0)';
     form.surname.value = response.surname;
     form.surname.previousElementSibling.style.cssText = 'transform: scale(100%) translateY(0) translateX(0)';
-    modalFormChange.addEventListener('submit', e => {
+
+    form.addEventListener('submit', submitChange, once);
+
+    function submitChange(e) {
       e.preventDefault();
       completeModalForm(modalFormChange, id);
-    });
+    }
+
     const closeBtn = form.querySelector('.js-close-modal');
     closeBtn.addEventListener('click', e => {
       e.preventDefault();
-      closeModal(modalFormChange, modalChangeData);
+      form.removeEventListener('submit', submitChange, once);
+      closeModal(modalFormChange, modalChangeWrapper);
+    })
+
+    modalChangeWrapper.addEventListener('click', (e) => {
+      modalFormChange.addEventListener('click', event => {
+        event._isClickWhithinModal = true;
+      })
+      if (e._isClickWhithinModal) {
+        return;
+      }
+      closeModal(modalFormChange, modalChangeWrapper);
+      form.removeEventListener('submit', submitChange, once);
     })
   }
 
   function openModalDelete(btn, id) {
-    btn.parentElement.classList.contains('form') ? hideModal(modalFormChange, modalChangeData) : '';
+    const itemClient = btn.parentElement.parentElement;
+    btn.parentElement.classList.contains('form') ? hideModal(modalFormChange, modalChangeWrapper) : '';
     modalDeleteWrapper.style.cssText = `visibility: visible; opacity: 1;`;
     modalFormDelete.style.transform = 'scale(1)';
     const submitLoadingCircle = modalFormDelete.querySelector('.btn-loading-svg');
     const submitBtn = modalFormDelete.querySelector('.js-submit-btn');
-    modalFormDelete.addEventListener('submit', e => {
-      e.preventDefault();
-      submitLoadingCircle.style.display = 'inline-block';
-      submitBtn.style.backgroundColor = 'var(--activeFirm)';
-      deleteClient(id);
-    });
+
+    modalFormDelete.addEventListener('submit', submitDelete, once);
+
     const closeBtn = modalFormDelete.querySelectorAll('.js-close-modal');
     closeBtn.forEach(item => {
       item.addEventListener('click', e => {
         e.preventDefault();
         closeModal(modalFormDelete, modalDeleteWrapper);
-      });
-    });
+        modalFormDelete.removeEventListener('submit', submitDelete, once);
+      })
+    })
+
+    modalFormDelete.parentElement.addEventListener('click', (e) => {
+      modalFormDelete.addEventListener('click', event => {
+        event._isClickWhithinModal = true;
+      })
+      if (e._isClickWhithinModal) {
+        return;
+      }
+      closeModal(modalFormDelete, modalDeleteWrapper);
+      modalFormDelete.removeEventListener('submit', submitDelete, once);
+    })
+
+    function submitDelete(e) {
+      e.preventDefault();
+      submitLoadingCircle.style.display = 'inline-block';
+      submitBtn.style.backgroundColor = 'var(--activeFirm)';
+      closeModal(modalFormDelete, modalDeleteWrapper);
+      itemClient.style.cssText = 'transition: transform .3s linear; transform: scale(50%);';
+      setTimeout(() => {
+        itemClient.remove();
+        deleteClient(id);
+      }, 300)
+    }
   }
 
   addContactBtn.forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const mainWrapper = item.parentElement;
-      if (mainWrapper.childNodes.length - 2 > 10) {
+      if (mainWrapper.childNodes.length - 2 >= 10) {
         item.style.display = 'none';
       };
       cheсkNChange(mainWrapper, 'open');
@@ -475,7 +513,7 @@
     }
   }
 
-  function completeModalForm(form, id) {
+  async function completeModalForm(form, id) {
     client = {};
     contacts = [];
     const submitLoadingCircle = form.querySelector('.btn-loading-svg');
@@ -516,16 +554,28 @@
     if (contacts.length !== 0) {
       client.contacts = contacts;
     };
+
+    const tableItems = document.querySelectorAll('.js-item-row');
+    tableItems.forEach(item => {
+      item.remove();
+    })
+    table.parentElement.style.marginBottom = '0';
+    const loading = document.querySelector('.table__white-screen');
+    loading.style.display = 'flex';
+    addClientBtn.style.display = 'none';
+
     if (id === 'null' || id === undefined) {
       submitLoadingCircle.style.display = 'inline-block';
       submitBtn.style.backgroundColor = 'var(--activeFirm)';
-      closeModal(modalFormAdd, modalAddClient);
-      postClient(client, form);
+      await postClient(client, form);
+      createClientList(await getClients(), 'api');
+      closeModal(modalFormAdd, modalAddWrapper);
     } else {
       submitLoadingCircle.style.display = 'inline-block';
       submitBtn.style.backgroundColor = 'var(--activeFirm)';
-      closeModal(modalFormChange, modalChangeData);
-      patchClient(id, client);
+      await patchClient(id, client);
+      createClientList(await getClients(), 'api');
+      closeModal(modalFormChange, modalChangeWrapper);
     };
   }
 
@@ -535,7 +585,7 @@
     surname,
     contacts
   }) {
-    fetch(`http://localhost:3000/api/clients/${id}`, {
+    await fetch(`http://localhost:3000/api/clients/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({
         lastName,
