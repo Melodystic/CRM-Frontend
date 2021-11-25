@@ -475,7 +475,7 @@
     }
   }
 
-  function completeModalForm(form, id, e) {
+  function completeModalForm(form, id) {
     client = {};
     contacts = [];
     const submitLoadingCircle = form.querySelector('.btn-loading-svg');
@@ -519,15 +519,13 @@
     if (id === 'null' || id === undefined) {
       submitLoadingCircle.style.display = 'inline-block';
       submitBtn.style.backgroundColor = 'var(--activeFirm)';
-      e.preventDefault();
       closeModal(modalFormAdd, modalAddClient);
-      postClient(client, form, e);
+      postClient(client, form);
     } else {
       submitLoadingCircle.style.display = 'inline-block';
       submitBtn.style.backgroundColor = 'var(--activeFirm)';
-      e.preventDefault();
       closeModal(modalFormChange, modalChangeData);
-      patchClient(id, client, e);
+      patchClient(id, client);
     };
   }
 
@@ -555,9 +553,7 @@
     name,
     surname,
     contacts
-  }, form, e) {
-    console.log(e);
-    e.preventDefault();
+  }, form) {
     const response = await fetch('http://localhost:3000/api/clients', {
       method: 'POST',
       body: JSON.stringify({
